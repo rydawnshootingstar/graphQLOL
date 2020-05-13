@@ -2,6 +2,10 @@
 
 Will hold my notes and projects related to learning GraphQL.
 
+The course I'm following is on Udemy: https://www.udemy.com/course/graphql-bootcamp/
+
+I intend to start using GraphQL for use with projects created with the GatsbyJS framework.
+
 <hr />
 <br />
 <hr />
