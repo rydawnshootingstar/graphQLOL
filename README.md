@@ -18,7 +18,7 @@ How GraphQL backends work:
 -   database agnostic. Doesn't matter what kinda db you use, if it's sql or nosql or what.
 -   self-documenting via a schema. Nobody has to manually keep track of what comes back from which query.
 
-The API paradigms are query, streaming, web, flat file, RPC. There is no "best" solution,
+The API paradigms are query, streaming, web, flat file, RPC. There is no "best" solution that fits all scenarios. GraphQL APIs can however replace a lot of REST-hopeful APIs out there that don't quite follow the architecture or don't need to be highly scalable, long-lasting, or otherwise complex enough to take advantage of the caching abilities that REST setups have.
 
 ## Why
 
@@ -80,3 +80,59 @@ And that's the bare minimum. Now we have a type
 ## Types
 
 There are 5 Scalar types: string, boolean, int, float, ID. These are just simple values.
+
+## Relationships Between Types
+
+Often you'll want to grab something from a Type that has a relationship to the one you're primarily interested in - a user's name from a post, for instance.
+
+```
+query{
+  posts{
+    id
+    body
+    title
+    author{
+      name
+      id
+    }
+  }
+}
+```
+
+Here we see an author being queried for each post, but since the author is of type User we actually need to specify what we want from that type of object. These relationships need to be explicitly set up in the typeDefs. This would need to exist in the Post type
+
+```
+author: User!
+```
+
+then we'd need to make a resolver function for it, because Post's a non scalar type.
+
+```
+	Post: {
+		author(parent, args, ctx, info) {
+			return users.find((user) => {
+				return user.id === parent.author;
+			});
+		}
+	}
+```
+
+this gives us the User object for each post on its author query. What if we wanted to also get the ability to grab all of a User's posts?
+
+```
+posts: [Post!]!
+```
+
+that array will of course call the resolver for Post for all of a user's posts. Here's what that resolver would look like:
+
+```
+	User: {
+		posts(parent, args, ctx, info) {
+			return proasts.filter((proast) => {
+				return proast.author === parent.id;
+			});
+		}
+	}
+```
+
+Again, the data comes in on parent.

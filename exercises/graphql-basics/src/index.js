@@ -23,12 +23,67 @@ const users = [
 	}
 ];
 
+const proasts = [
+	{
+		id: 1,
+		title: 'poasting in a thread',
+		body:
+			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
+		published: true,
+		author: 123
+	},
+	{
+		id: 2,
+		title: 'poasting in a dead',
+		body:
+			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
+		published: false,
+		author: 123
+	},
+	{
+		id: 3,
+		title: 'poasting in a bread',
+		body:
+			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
+		published: true,
+		author: 124
+	},
+	{
+		id: 4,
+		title: 'poasting in a dread',
+		body:
+			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
+		published: true,
+		author: 125
+	}
+];
+
+const comments = [
+	{
+		id: 1,
+		text: 'comment one',
+		author: 123
+	},
+	{
+		id: 2,
+		text: `comment two`,
+		author: 123
+	},
+	{
+		id: 3,
+		text: `comment 3`,
+		author: 124
+	}
+];
+
 const typeDefs = `
 
     type Query{
         me: User!
         post: Post!
+        posts (query: String): [Post!]!
         users(query: String):  [User!]!
+        comments(query: String, user: String): [Comment!]!
     }
 
     type User{
@@ -36,6 +91,8 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int
+        posts: [Post!]!
+        comments: [Comment!]!
     }
 
     type Post{
@@ -43,6 +100,13 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
+    }
+
+    type Comment{
+        id: ID!
+        text: String!
+        author: User!
     }
 `;
 
@@ -58,6 +122,53 @@ const resolvers = {
 			}
 			return users.filter((user) => {
 				return user.name.toLowerCase().includes(args.query.toLowerCase());
+			});
+		},
+		posts(parent, args, ctx, info) {
+			if (!args.query || args.query === '') {
+				return proasts;
+			}
+
+			return proasts.filter((proast) => {
+				return (
+					proast.published &&
+					(proast.title.toLowerCase().includes(args.query) || proast.body.toLowerCase().includes(args.query))
+				);
+			});
+		},
+		comments(parent, args, ctx, info) {
+			if (!args.query) {
+				return comments;
+			}
+
+			return comments.filter((comment) => {
+				return comment.text.toLowerCase().includes(args.query.toLowerCase());
+			});
+		}
+	},
+	Post: {
+		author(parent, args, ctx, info) {
+			return users.find((user) => {
+				return user.id === parent.author;
+			});
+		}
+	},
+	User: {
+		posts(parent, args, ctx, info) {
+			return proasts.filter((proast) => {
+				return proast.author === parent.id;
+			});
+		},
+		comments(parent, args, ctx, info) {
+			return comments.filter((comment) => {
+				return comment.author === parent.id;
+			});
+		}
+	},
+	Comment: {
+		author(parent, args, ctx, info) {
+			return users.find((user) => {
+				return user.id === parent.author;
 			});
 		}
 	}
