@@ -5,19 +5,19 @@ import { v4 as uuid } from 'uuid';
 
 const users = [
 	{
-		id: 123,
+		id: "ed95984f-3c84-4f36-8b47-792308ff936c",
 		name: 'Ryan',
 		email: 'ryan@ryan.com',
 		age: 31
 	},
 	{
-		id: 124,
+		id: '9af1657b-7c88-44ca-96d5-a447b18bbec9',
 		name: 'Alex',
 		email: 'Alex@alex.com',
 		age: 26
 	},
 	{
-		id: 125,
+		id: '03fd8f3d-d657-4c37-a6f0-2bbf8ea81868',
 		name: 'Mitch',
 		email: 'mitch@mitchell.com',
 		age: 25
@@ -26,57 +26,57 @@ const users = [
 
 const proasts = [
 	{
-		id: 1,
+		id: 'b3cfd642-5fbb-4ba1-972b-e88e349e09c5',
 		title: 'poasting in a thread',
 		body:
 			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
 		published: true,
-		author: 123
+		author: "ed95984f-3c84-4f36-8b47-792308ff936c"
 	},
 	{
-		id: 2,
+		id: 'a9a9ea1f-ca6a-4e72-885f-169b2424d0dc',
 		title: 'poasting in a dead',
 		body:
 			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
 		published: false,
-		author: 123
+		author: "ed95984f-3c84-4f36-8b47-792308ff936c"
 	},
 	{
-		id: 3,
+		id: '5c9302ea-2c9a-488a-889b-70457897df7e',
 		title: 'poasting in a bread',
 		body:
 			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
 		published: true,
-		author: 124
+		author: '9af1657b-7c88-44ca-96d5-a447b18bbec9'
 	},
 	{
-		id: 4,
+		id: '7be9f291-ba6b-4308-a6ce-b4a7db38b24a',
 		title: 'poasting in a dread',
 		body:
 			'Laborum do et magna ad minim nisi exercitation id elit ea in commodo tempor eiusmod. Dolor ut amet dolore fugiat in eu. Tempor ut dolore ex consequat enim. Non cillum deserunt esse minim aute.',
 		published: true,
-		author: 125
+		author: '03fd8f3d-d657-4c37-a6f0-2bbf8ea81868'
 	}
 ];
 
 const comments = [
 	{
-		id: 1,
+		id: '9f5270a7-d1c2-4fd4-8044-b8ab7462c329',
 		text: 'comment one',
-		author: 123,
-		post: 1
+		author: "ed95984f-3c84-4f36-8b47-792308ff936c",
+		post: 'b3cfd642-5fbb-4ba1-972b-e88e349e09c5'
 	},
 	{
-		id: 2,
+		id: 'b8e71552-34b2-463e-b1ca-5e4e23d756e1',
 		text: `comment two`,
-		author: 123,
-		post: 1
+		author: "ed95984f-3c84-4f36-8b47-792308ff936c",
+		post: 'b3cfd642-5fbb-4ba1-972b-e88e349e09c5'
 	},
 	{
-		id: 3,
+		id: '209da04c-6c25-44e3-a9f7-b98b379a0f5f',
 		text: `comment 3`,
-		author: 124,
-		post: 4
+		author: '9af1657b-7c88-44ca-96d5-a447b18bbec9',
+		post: '7be9f291-ba6b-4308-a6ce-b4a7db38b24a'
 	}
 ];
 
@@ -87,11 +87,13 @@ const typeDefs = `
         post: Post!
         posts (query: String): [Post!]!
         users(query: String):  [User!]!
-        comments(query: String, user: String): [Comment!]!
+		comments(query: String, user: String): [Comment!]!
     }
 
     type Mutation{
-        createUser(name: String!, email: String!, age: Int): User!
+		createUser(name: String!, email: String!, age: Int): User!
+		createPost(title:String!, body: String!, published: Boolean!, author: ID! ) : Post!
+		createComment(text: String!, author: ID!, post: ID!): Comment!
     }
 
     type User{
@@ -175,6 +177,56 @@ const resolvers = {
 
 			users.push(user);
 			return user;
+		},
+		createPost(parent, args, ctx, info){
+			const userExists = users.some((user)=> {
+				return user.id === args.author;
+			});
+
+			if(!userExists){
+				throw new Error(`This id does not belong to a user.`);
+			}
+
+			const post = {
+				id: uuid(),
+				author: args.author,
+				title: args.title,
+				body: args.body,
+				published: args.published
+			}
+
+
+			proasts.push(post);
+			return post;	
+		},
+		createComment(parent, args, ctx, info){
+ 			const userExists = users.some((user)=> {
+				return user.id === args.author;
+			});
+
+			const postExists = proasts.filter((proast)=> {
+				return proast.id === args.post && proast.published;
+			})
+
+			if(!userExists){
+				throw new Error(`This ID does not belong to a user.`);
+			}
+			if(!postExists){
+				throw new Error(`A published post with this ID doesn't exist`)
+			}
+
+			const comment = {
+				id: uuid(),
+				author: args.author,
+				text: args.text,
+				post: args.post
+			}
+
+			comments.push(comment);
+
+			return comment;
+
+
 		}
 	},
 	Post: {

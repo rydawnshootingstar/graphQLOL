@@ -32,6 +32,9 @@ The API paradigms are query, streaming, web, flat file, RPC. There is no "best" 
 
 The appeal of GraphQL seems to come when you want something very simple: to have your front-end communicate with your back-end. True REST architecture aims to solve some different problems.
 
+### My Thoughts So Far
+In a React application, a graphql api might be useful to quickly grab info based on what you have access to in that particular context. You might have the user's name and want something off of that, or you might have an ID for a post or something and want the user information off of that. It could eliminate some of the need to have a bunch of props passed down. 
+
 ## WTF is a Graph?
 
 It's a way to think about our data and how it relates to each other.
