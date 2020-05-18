@@ -10,7 +10,7 @@ I intend to immediately start using GraphQL with projects created with the Gatsb
 <br />
 <hr />
 
-# GraphQL
+# GraphQL Basics
 
 How GraphQL backends work:
 
@@ -20,7 +20,7 @@ How GraphQL backends work:
 
 The API paradigms are query, streaming, web, flat file, RPC. There is no "best" solution that fits all scenarios. GraphQL APIs can however replace a lot of REST-hopeful APIs out there that don't quite follow the architecture or don't need to be highly scalable, long-lasting, or otherwise complex enough to take advantage of the caching abilities that REST setups have.
 
-## Why
+## Why Use It?
 
 -   Speed - makes fewer HTTP requests
 -   Flexibility
@@ -32,13 +32,13 @@ The API paradigms are query, streaming, web, flat file, RPC. There is no "best" 
 
 The appeal of GraphQL seems to come when you want something very simple: to have your front-end communicate with your back-end. True REST architecture aims to solve some different problems.
 
-## WTF is a graph
+## WTF is a Graph?
 
 It's a way to think about our data and how it relates to each other.
 
 **Types** like User, Post, Comment are root objects. Types have fields. Users might have an id, a name, an age. A post might also have an id, a title, a body, a publishedStatus. There are also relationships between types like a user's list of posts, and a relationship between a post and its author.
 
-## Structure of a query
+## Structure of a Query
 
 Specify type(s) you want, then what fields you want from them. You must specify what fields you want from a type. You cannot simply request an entire object. It's up to the dev to optimize the queries
 
@@ -52,6 +52,10 @@ a [] indicates that a returned value will be an array.
 -   graphql-yoga is an easy to use graphql server
 
 Creating a schema is the first order of business. Think about the types of data the API will be serving up. These types will be defined in a string that contains graphQL code.
+
+# Reading Data
+
+To read from your GraphQL API, you need to define a Type called Query. The objects in the query definition follow the pattern of [name]: [returned value].
 
 ```
 const typeDefs = `
@@ -136,3 +140,11 @@ that array will of course call the resolver for Post for all of a user's posts. 
 ```
 
 Again, the data comes in on parent.
+
+# Writing Data
+
+To complete the rest of our basic functionality, the Create, Update and Delete operations, we need to define a type called Mutation
+
+```
+
+```

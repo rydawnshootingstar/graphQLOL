@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga';
+import { v4 as uuid } from 'uuid';
 
 // Type defs
 
@@ -62,17 +63,20 @@ const comments = [
 	{
 		id: 1,
 		text: 'comment one',
-		author: 123
+		author: 123,
+		post: 1
 	},
 	{
 		id: 2,
 		text: `comment two`,
-		author: 123
+		author: 123,
+		post: 1
 	},
 	{
 		id: 3,
 		text: `comment 3`,
-		author: 124
+		author: 124,
+		post: 4
 	}
 ];
 
@@ -84,6 +88,10 @@ const typeDefs = `
         posts (query: String): [Post!]!
         users(query: String):  [User!]!
         comments(query: String, user: String): [Comment!]!
+    }
+
+    type Mutation{
+        createUser(name: String!, email: String!, age: Int): User!
     }
 
     type User{
@@ -101,12 +109,14 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
+        comments: [Comment!]!
     }
 
     type Comment{
         id: ID!
         text: String!
         author: User!
+        post: Post!
     }
 `;
 
@@ -146,10 +156,36 @@ const resolvers = {
 			});
 		}
 	},
+	Mutation: {
+		createUser(parent, args, ctx, info) {
+			const emailTaken = users.some((user) => {
+				return user.email === args.email;
+			});
+
+			if (emailTaken) {
+				throw new Error(`A user with this email already exists. Please choose a unique email.`);
+			}
+
+			const user = {
+				id: uuid(),
+				name: args.name,
+				email: args.email,
+				age: args.age || null
+			};
+
+			users.push(user);
+			return user;
+		}
+	},
 	Post: {
 		author(parent, args, ctx, info) {
 			return users.find((user) => {
 				return user.id === parent.author;
+			});
+		},
+		comments(parent, args, ctx, info) {
+			return comments.filter((comment) => {
+				return comment.post === parent.id;
 			});
 		}
 	},
@@ -169,6 +205,11 @@ const resolvers = {
 		author(parent, args, ctx, info) {
 			return users.find((user) => {
 				return user.id === parent.author;
+			});
+		},
+		post(parent, args, ctx, info) {
+			return proasts.find((proasts) => {
+				return proasts.id === parent.id;
 			});
 		}
 	}
