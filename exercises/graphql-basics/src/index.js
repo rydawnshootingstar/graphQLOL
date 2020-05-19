@@ -2,80 +2,19 @@ import { GraphQLServer } from "graphql-yoga";
 import { v4 as uuid } from "uuid";
 import { usersData, proastsData, commentsData } from "./dummydata/data";
 
-
+// imported data comes in as const!
 let users = usersData;
 let proasts = proastsData;
 let comments = commentsData;
 
-// Type defs
 
-const typeDefs = `
-
-    type Query{
-        me: User!
-        post: Post!
-        posts (query: String): [Post!]!
-        users(query: String):  [User!]!
-		comments(query: String, user: String): [Comment!]!
-    }
-
-    type Mutation{
-		createUser(data: CreateUserInput): User!
-		createPost(data: CreatePostInput) : Post!
-		createComment(data: CreateCommentInput): Comment!
-        deleteUser(id: ID!): User!
-        deletePost(id: ID!): Post!
-        deleteComment(id: ID!): Comment!
-	}
-	
-	input CreateUserInput{
-		name: String!
-		email: String
-		age: Int
-	}
-
-	input CreatePostInput{
-		title: String!
-		body: String!
-		published: Boolean!
-		author: ID! 
-	}
-
-	input CreateCommentInput{
-		text: String!
-		author: ID!
-		post: ID!
-	}
-
-    type User{
-        id: ID!
-        name: String!
-        email: String!
-        age: Int
-        posts: [Post!]!
-        comments: [Comment!]!
-    }
-
-    type Post{
-        id: ID!
-        title: String!
-        body: String!
-        published: Boolean!
-        author: User!
-        comments: [Comment!]!
-    }
-
-    type Comment{
-        id: ID!
-        text: String!
-        author: User!
-        post: Post!
-    }
-`;
 
 // Resolvers
 
 const resolvers = {
+    /*
+        Regular Queries
+    */
     Query: {
         me(parent, args, ctx, info) {},
         post(parent, args, ctx, info) {},
@@ -114,6 +53,9 @@ const resolvers = {
             });
         },
     },
+    /* 
+        Mutations
+    */
     Mutation: {
         createUser(parent, args, ctx, info) {
             const emailTaken = users.some((user) => {
@@ -193,15 +135,15 @@ const resolvers = {
                 throw new Error(`No post with this id exists`);
             }
 
-            // deletes posts and store returned value
-           const deletedProast = proasts.splice(postToDelete, 1);
+            // deletes posts and store returned value in array
+           const deletedProasts = proasts.splice(postToDelete, 1);
 
            // delete all comments associated with post
            comments.filter((comment)=> {
                return comment.post !== args.id
            });
 
-           return postToDelete;
+           return deletedProasts[0];
         
         },
         createComment(parent, args, ctx, info) {
@@ -238,11 +180,15 @@ const resolvers = {
                 throw new Error(`No comment with this id exists`);
             }
 
-            const deletedComment = comments.splice(commentExists, 1);
+            const deletedComments = comments.splice(commentExists, 1);
 
-            return deletedComment;
+            return deletedComments[0];
         },
     },
+
+    /*
+        Type Relationships
+    */
     Post: {
         author(parent, args, ctx, info) {
             return users.find((user) => {
@@ -282,7 +228,7 @@ const resolvers = {
 };
 
 const server = new GraphQLServer({
-    typeDefs,
+    typeDefs: 'src/schema.graphql',
     resolvers,
 });
 
