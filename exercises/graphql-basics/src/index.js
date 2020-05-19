@@ -23,7 +23,9 @@ const typeDefs = `
 		createUser(data: CreateUserInput): User!
 		createPost(data: CreatePostInput) : Post!
 		createComment(data: CreateCommentInput): Comment!
-		deleteUser(id: ID!): User!
+        deleteUser(id: ID!): User!
+        deletePost(id: ID!): Post!
+        deleteComment(id: ID!): Comment!
 	}
 	
 	input CreateUserInput{
@@ -182,6 +184,26 @@ const resolvers = {
             proasts.push(post);
             return post;
         },
+        deletePost(parent, args, ctx, info){
+            const postToDelete = proasts.findIndex((post)=> {
+                return post.id === args.id;
+            });
+
+            if(postToDelete === -1){
+                throw new Error(`No post with this id exists`);
+            }
+
+            // deletes posts and store returned value
+           const deletedProast = proasts.splice(postToDelete, 1);
+
+           // delete all comments associated with post
+           comments.filter((comment)=> {
+               return comment.post !== args.id
+           });
+
+           return postToDelete;
+        
+        },
         createComment(parent, args, ctx, info) {
             const userExists = users.some((user) => {
                 return user.id === args.data.author;
@@ -206,6 +228,19 @@ const resolvers = {
             comments.push(comment);
 
             return comment;
+        },
+        deleteComment(parent, args, ctx, info){
+            const commentExists = comments.findIndex((comment)=> {
+                return comment.id === args.id;
+            });
+
+            if(commentExists === -1){
+                throw new Error(`No comment with this id exists`);
+            }
+
+            const deletedComment = comments.splice(commentExists, 1);
+
+            return deletedComment;
         },
     },
     Post: {
