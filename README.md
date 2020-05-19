@@ -151,3 +151,5 @@ To complete the rest of our basic functionality, the Create, Update and Delete o
 ```
 
 ```
+# Context
+context is a variable that gets passed to a resolver 

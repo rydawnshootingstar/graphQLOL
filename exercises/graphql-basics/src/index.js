@@ -1,39 +1,31 @@
 import { GraphQLServer } from "graphql-yoga";
 import { v4 as uuid } from "uuid";
-import { usersData, proastsData, commentsData } from "./dummydata/data";
+import db from "./db";
 
-// imported data comes in as const!
-let users = usersData;
-let proasts = proastsData;
-let comments = commentsData;
-
-
-
-// Resolvers
 
 const resolvers = {
     /*
         Regular Queries
     */
     Query: {
-        me(parent, args, ctx, info) {},
-        post(parent, args, ctx, info) {},
-        users(parent, args, ctx, info) {
+        me(parent, args, {db}, info) {},
+        post(parent, args, {db}, info) {},
+        users(parent, args, {db}, info) {
             if (!args.query) {
-                return users;
+                return db.users;
             }
-            return users.filter((user) => {
+            return db.db.users.filter((user) => {
                 return user.name
                     .toLowerCase()
                     .includes(args.query.toLowerCase());
             });
         },
-        posts(parent, args, ctx, info) {
+        posts(parent, args, {db}, info) {
             if (!args.query || args.query === "") {
-                return proasts;
+                return db.proasts;
             }
 
-            return proasts.filter((proast) => {
+            return db.db.proasts.filter((proast) => {
                 return (
                     proast.published &&
                     (proast.title.toLowerCase().includes(args.query) ||
@@ -41,12 +33,12 @@ const resolvers = {
                 );
             });
         },
-        comments(parent, args, ctx, info) {
+        comments(parent, args, {db}, info) {
             if (!args.query) {
-                return comments;
+                return db.comments;
             }
 
-            return comments.filter((comment) => {
+            return db.db.comments.filter((comment) => {
                 return comment.text
                     .toLowerCase()
                     .includes(args.query.toLowerCase());
@@ -57,8 +49,8 @@ const resolvers = {
         Mutations
     */
     Mutation: {
-        createUser(parent, args, ctx, info) {
-            const emailTaken = users.some((user) => {
+        createUser(parent, args, {db}, info) {
+            const emailTaken = db.users.some((user) => {
                 return user.email === args.data.email;
             });
 
@@ -73,11 +65,11 @@ const resolvers = {
                 ...args.data,
             };
 
-            users.push(user);
+            db.users.push(user);
             return user;
         },
-        deleteUser(parent, args, ctx, info) {
-            const userIndex = users.findIndex((user) => {
+        deleteUser(parent, args, {db}, info) {
+            const userIndex = db.users.findIndex((user) => {
                 return user.id === args.id;
             });
 
@@ -87,14 +79,14 @@ const resolvers = {
 
             // remember, splice returns values that were removed, and we want them in this case
             // this will delete the user
-            const deletedUsers = users.splice(userIndex, 1);
+            const deletedUsers = db.users.splice(userIndex, 1);
 
             // delete all of a user's posts, and each of those post's comments
-            proasts = proasts.filter((proast) => {
+            proasts = db.proasts.filter((proast) => {
                 const postsToDelete = proast.author === args.id;
 
                 if (postsToDelete) {
-                    comments = comments.filter((comment) => {
+                    comments = db.comments.filter((comment) => {
                         return comment.post !== proast.id;
                     });
                 }
@@ -103,14 +95,14 @@ const resolvers = {
             });
 
             // delete all of a user's comments
-            comments = comments.filter((comment) => {
+            comments = db.comments.filter((comment) => {
                 return comment.author !== args.id;
             });
 
             return deletedUsers[0];
         },
-        createPost(parent, args, ctx, info) {
-            const userExists = users.some((user) => {
+        createPost(parent, args, {db}, info) {
+            const userExists = db.users.some((user) => {
                 return user.id === args.data.author;
             });
 
@@ -123,11 +115,11 @@ const resolvers = {
                 ...args.data,
             };
 
-            proasts.push(post);
+            db.proasts.push(post);
             return post;
         },
-        deletePost(parent, args, ctx, info){
-            const postToDelete = proasts.findIndex((post)=> {
+        deletePost(parent, args, {db}, info){
+            const postToDelete = db.proasts.findIndex((post)=> {
                 return post.id === args.id;
             });
 
@@ -136,22 +128,22 @@ const resolvers = {
             }
 
             // deletes posts and store returned value in array
-           const deletedProasts = proasts.splice(postToDelete, 1);
+           const deletedProasts = db.proasts.splice(postToDelete, 1);
 
            // delete all comments associated with post
-           comments.filter((comment)=> {
+           db.comments.filter((comment)=> {
                return comment.post !== args.id
            });
 
            return deletedProasts[0];
         
         },
-        createComment(parent, args, ctx, info) {
-            const userExists = users.some((user) => {
+        createComment(parent, args, {db}, info) {
+            const userExists = db.users.some((user) => {
                 return user.id === args.data.author;
             });
 
-            const postExists = proasts.filter((proast) => {
+            const postExists = db.proasts.filter((proast) => {
                 return proast.id === args.data.post && proast.published;
             });
 
@@ -167,12 +159,12 @@ const resolvers = {
                 ...args.data,
             };
 
-            comments.push(comment);
+            db.comments.push(comment);
 
             return comment;
         },
-        deleteComment(parent, args, ctx, info){
-            const commentExists = comments.findIndex((comment)=> {
+        deleteComment(parent, args, {db}, info){
+            const commentExists = db.comments.findIndex((comment)=> {
                 return comment.id === args.id;
             });
 
@@ -180,7 +172,7 @@ const resolvers = {
                 throw new Error(`No comment with this id exists`);
             }
 
-            const deletedComments = comments.splice(commentExists, 1);
+            const deletedComments = db.comments.splice(commentExists, 1);
 
             return deletedComments[0];
         },
@@ -190,46 +182,53 @@ const resolvers = {
         Type Relationships
     */
     Post: {
-        author(parent, args, ctx, info) {
-            return users.find((user) => {
+        author(parent, args, {db}, info) {
+            return db.users.find((user) => {
                 return user.id === parent.author;
             });
         },
-        comments(parent, args, ctx, info) {
-            return comments.filter((comment) => {
+        comments(parent, args, {db}, info) {
+            return db.comments.filter((comment) => {
                 return comment.post === parent.id;
             });
         },
     },
     User: {
-        posts(parent, args, ctx, info) {
-            return proasts.filter((proast) => {
+        posts(parent, args, {db}, info) {
+            return db.proasts.filter((proast) => {
                 return proast.author === parent.id;
             });
         },
-        comments(parent, args, ctx, info) {
-            return comments.filter((comment) => {
+        comments(parent, args, {db}, info) {
+            return db.comments.filter((comment) => {
                 return comment.author === parent.id;
             });
         },
     },
     Comment: {
-        author(parent, args, ctx, info) {
-            return users.find((user) => {
+        author(parent, args, {db}, info) {
+            return db.users.find((user) => {
                 return user.id === parent.author;
             });
         },
-        post(parent, args, ctx, info) {
-            return proasts.find((proasts) => {
-                return proasts.id === parent.id;
+        post(parent, args, {db}, info) {
+            return db.proasts.find((proast) => {
+                return proast.id === parent.id;
             });
         },
     },
 };
 
+/*
+    Server Config and Initialization
+*/
+
 const server = new GraphQLServer({
     typeDefs: 'src/schema.graphql',
     resolvers,
+    context:{
+        db
+    }
 });
 
 server.start(() => {
