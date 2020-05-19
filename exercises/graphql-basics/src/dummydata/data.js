@@ -1,4 +1,4 @@
-export const users = [
+export let usersData = [
 	{
 		id: "ed95984f-3c84-4f36-8b47-792308ff936c",
 		name: 'Ryan',
@@ -19,7 +19,7 @@ export const users = [
 	}
 ];
 
-export const proasts = [
+export let proastsData = [
 	{
 		id: 'b3cfd642-5fbb-4ba1-972b-e88e349e09c5',
 		title: 'poasting in a thread',
@@ -54,7 +54,7 @@ export const proasts = [
 	}
 ];
 
-export const comments = [
+export let commentsData = [
 	{
 		id: '9f5270a7-d1c2-4fd4-8044-b8ab7462c329',
 		text: 'comment one',
