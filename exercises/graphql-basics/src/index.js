@@ -82,11 +82,11 @@ const resolvers = {
             const deletedUsers = db.users.splice(userIndex, 1);
 
             // delete all of a user's posts, and each of those post's comments
-            proasts = db.proasts.filter((proast) => {
+            db.proasts = db.proasts.filter((proast) => {
                 const postsToDelete = proast.author === args.id;
 
                 if (postsToDelete) {
-                    comments = db.comments.filter((comment) => {
+                    db.comments = db.comments.filter((comment) => {
                         return comment.post !== proast.id;
                     });
                 }
@@ -95,7 +95,7 @@ const resolvers = {
             });
 
             // delete all of a user's comments
-            comments = db.comments.filter((comment) => {
+            db.comments = db.comments.filter((comment) => {
                 return comment.author !== args.id;
             });
 
