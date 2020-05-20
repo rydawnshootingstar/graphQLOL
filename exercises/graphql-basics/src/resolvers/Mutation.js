@@ -100,6 +100,30 @@ const Mutation = {
         db.proasts.push(post);
         return post;
     },
+    updatePost(parent, {id, data}, {db}, info){
+        const post = db.proasts.find((proast)=> {
+            return proast.id === id;
+        })
+
+        if(!post){
+            throw new Error(`A post with this ID does not exist`);
+        }
+
+        if(typeof data.title === 'string'){
+            post.title = data.title;
+        }
+
+        if(typeof data.body === 'string'){
+            post.body = data.body;
+        }
+
+        if(typeof data.published === 'boolean'){
+            post.published = data.published
+        }
+
+        return post;
+
+    },
     deletePost(parent, args, { db }, info) {
         const postToDelete = db.proasts.findIndex((post) => {
             return post.id === args.id;
@@ -143,6 +167,20 @@ const Mutation = {
         db.comments.push(comment);
 
         return comment;
+    },
+    updateComment(parent, {id, data}, {db}, info){
+        const comment = db.comments.find((comment)=> {
+            return comment.id === id;
+        });
+
+        if(!comment){
+            throw new Error(`A comment with this ID doesn't exist`);
+        }
+
+        if(typeof data.text === 'string'){
+            comment.text = data.text;
+        }
+        return comment
     },
     deleteComment(parent, args, { db }, info) {
         const commentExists = db.comments.findIndex((comment) => {
