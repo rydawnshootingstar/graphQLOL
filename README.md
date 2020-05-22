@@ -33,7 +33,8 @@ The API paradigms are query, streaming, web, flat file, RPC. There is no "best" 
 The appeal of GraphQL seems to come when you want something very simple: to have your front-end communicate with your back-end. True REST architecture aims to solve some different problems.
 
 ### My Thoughts So Far
-In a React application, a graphql api might be useful to quickly grab info based on what you have access to in that particular context. You might have the user's name and want something off of that, or you might have an ID for a post or something and want the user information off of that. It could eliminate some of the need to have a bunch of props passed down. 
+
+In a React application, a graphql api might be useful to quickly grab info based on what you have access to in that particular context. You might have the user's name and want something off of that, or you might have an ID for a post or something and want the user information off of that. It could eliminate some of the need to have a bunch of props passed down.
 
 ## WTF is a Graph?
 
@@ -151,5 +152,11 @@ To complete the rest of our basic functionality, the Create, Update and Delete o
 ```
 
 ```
+
 # Context
-context is a variable that gets passed to a resolver 
+
+context is a variable that gets passed to a resolver
+
+# Subscriptions
+
+Subscriptions act as real-time communications between client and server. We can subscribe to data changes, allowing us to fetch any updates as they happen via websockets. We don't need to constantly poll our server, or making additional requests that can become quite expensive. Subscriptions are a Type and are defined just like any other type with its own resolver.
