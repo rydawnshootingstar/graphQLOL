@@ -79,7 +79,7 @@ const Mutation = {
 
 		return deletedUsers[0];
 	},
-	createPost(parent, args, { db }, info) {
+	createPost(parent, args, { db, pubsub }, info) {
 		const userExists = db.users.some((user) => {
 			return user.id === args.data.author;
 		});
@@ -94,12 +94,22 @@ const Mutation = {
 		};
 
 		db.proasts.push(post);
+		if (post.published) {
+			pubsub.publish(`post`, {
+				post: {
+					data: post,
+					mutation: 'CREATED',
+				},
+			});
+		}
 		return post;
 	},
-	updatePost(parent, { id, data }, { db }, info) {
+	updatePost(parent, { id, data }, { db, pubsub }, info) {
 		const post = db.proasts.find((proast) => {
 			return proast.id === id;
 		});
+
+		const originalPost = { ...post };
 
 		if (!post) {
 			throw new Error(`A post with this ID does not exist`);
@@ -115,16 +125,38 @@ const Mutation = {
 
 		if (typeof data.published === 'boolean') {
 			post.published = data.published;
+			if (originalPost.published && !post.published) {
+				pubsub.publish(`post`, {
+					post: {
+						mutation: 'DELETED',
+						data: originalPost,
+					},
+				});
+			} else if (!originalPost.published && post.published) {
+				pubsub.publish(`post`, {
+					post: {
+						mutation: 'CREATED',
+						data: post,
+					},
+				});
+			} else if (post.published) {
+				pubsub.publish(`post`, {
+					post: {
+						mutation: 'UPDATED',
+						data: post,
+					},
+				});
+			}
 		}
 
 		return post;
 	},
-	deletePost(parent, args, { db }, info) {
-		const postToDelete = db.proasts.findIndex((post) => {
+	deletePost(parent, args, { db, pubsub }, info) {
+		const postToDeleteIndex = db.proasts.findIndex((post) => {
 			return post.id === args.id;
 		});
 
-		if (postToDelete === -1) {
+		if (postToDeleteIndex === -1) {
 			throw new Error(`No post with this id exists`);
 		}
 
@@ -136,15 +168,24 @@ const Mutation = {
 			return comment.post !== args.id;
 		});
 
+		if (deletedProasts[0].published) {
+			pubsub.publish(`post`, {
+				post: {
+					mutation: 'DELETED',
+					data: deletedProasts[0],
+				},
+			});
+		}
+
 		return deletedProasts[0];
 	},
-	createComment(parent, args, { db, pubsub }, info) {
+	createComment(parent, { data }, { db, pubsub }, info) {
 		const userExists = db.users.some((user) => {
-			return user.id === args.data.author;
+			return user.id === data.author;
 		});
 
 		const postExists = db.proasts.filter((proast) => {
-			return proast.id === args.data.post && proast.published;
+			return proast.id === data.post && proast.published;
 		});
 
 		if (!userExists) {
@@ -156,14 +197,19 @@ const Mutation = {
 
 		const comment = {
 			id: uuid(),
-			...args.data,
+			...data,
 		};
 		db.comments.push(comment);
-		pubsub.publish(`comment: ${args.data.post}`, { comment });
+		pubsub.publish(`comment: ${data.post}`, {
+			comment: {
+				mutation: 'CREATED',
+				data: comment,
+			},
+		});
 
 		return comment;
 	},
-	updateComment(parent, { id, data }, { db }, info) {
+	updateComment(parent, { id, data }, { db, pubsub }, info) {
 		const comment = db.comments.find((comment) => {
 			return comment.id === id;
 		});
@@ -175,18 +221,31 @@ const Mutation = {
 		if (typeof data.text === 'string') {
 			comment.text = data.text;
 		}
+		pubsub.publish(`comment: ${comment.post}`, {
+			comment: {
+				mutation: 'UPDATED',
+				data: comment,
+			},
+		});
 		return comment;
 	},
-	deleteComment(parent, args, { db }, info) {
-		const commentExists = db.comments.findIndex((comment) => {
-			return comment.id === args.id;
+	deleteComment(parent, { id }, { db, pubsub }, info) {
+		const commentIndex = db.comments.findIndex((comment) => {
+			return comment.id === id;
 		});
 
-		if (commentExists === -1) {
+		if (commentIndex === -1) {
 			throw new Error(`No comment with this id exists`);
 		}
 
-		const deletedComments = db.comments.splice(commentExists, 1);
+		const deletedComments = db.comments.splice(commentIndex, 1);
+
+		pubsub.publish(`comment: ${deletedComments[0].post}`, {
+			comment: {
+				mutation: 'DELETED',
+				data: deletedComments[0],
+			},
+		});
 
 		return deletedComments[0];
 	},
