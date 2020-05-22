@@ -160,3 +160,7 @@ context is a variable that gets passed to a resolver
 # Subscriptions
 
 Subscriptions act as real-time communications between client and server. We can subscribe to data changes, allowing us to fetch any updates as they happen via websockets. We don't need to constantly poll our server, or making additional requests that can become quite expensive. Subscriptions are a Type and are defined just like any other type with its own resolver.
+
+# Enums
+
+Type that defines a set of constants. It can be used as a field like userRole where there are only 3 types of users - normal, editor, admin. So when we set the role for the user we don't wanna use any old String! we want it to be in those three. Enums are especially good for client-server data flows, since we can enforce what exactly they can send.

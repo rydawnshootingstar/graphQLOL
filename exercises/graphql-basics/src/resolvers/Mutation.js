@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+
 const Mutation = {
 	createUser(parent, args, { db }, info) {
 		const emailTaken = db.users.some((user) => {
