@@ -164,3 +164,7 @@ Subscriptions act as real-time communications between client and server. We can 
 # Enums
 
 Type that defines a set of constants. It can be used as a field like userRole where there are only 3 types of users - normal, editor, admin. So when we set the role for the user we don't wanna use any old String! we want it to be in those three. Enums are especially good for client-server data flows, since we can enforce what exactly they can send.
+
+# Prisma
+
+Prisma is an ORM that can be used with any backend/db. It introduces a graphql API to use with our database. This project will be using PostgreSQL.
