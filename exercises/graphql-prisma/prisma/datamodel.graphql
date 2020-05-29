@@ -1,5 +1,3 @@
-# SET_NULL is the default for deletions, CASCADE is another option.
-
 type User {
 	id: ID! @id
 	name: String!
