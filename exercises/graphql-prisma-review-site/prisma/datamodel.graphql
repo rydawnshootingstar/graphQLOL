@@ -3,50 +3,53 @@ type User {
 	type: UserType!
 	name: String!
 	email: String! @unique
-	reviews: [Review!]! @relation(name:"UserToReview", onDelete: CASCADE)
+	password: String!
+	reviews: [Review!]! @relation(name: "UserToReview", onDelete: CASCADE)
 	active: Boolean!
 }
 
-type Artist{
+type Artist {
+	id: ID! @id
 	name: String!
 	genre: String
 	active: Boolean
 	picture: String
 	bio: String
-	links: [String]
+	addedBy: User! @relation(name: "ArtistToUser", onDelete: SET_NULL)
+	links: [String] @scalarList(strategy: RELATION)
 	albums: [Album!]! @relation(name: "ArtistToAlbum", onDelete: CASCADE)
 }
 
 type Album {
 	id: ID! @id
 	title: String!
-	artist: [Artist!]! @relation(name:"AlbumToArtist", onDelete: SET_NULL)
+	artist: [Artist!]! @relation(name: "AlbumToArtist", onDelete: SET_NULL)
 	releaseDate: String!
-	cover: String
-	ratings: 
+	cover: String!
+	ratings: [Review!] @relation(name: "AlbumToReview", onDelete: SET_NULL)
 }
 
-# Reviews must contain a numerical rating from 1 to 10 with fractions allowed. 
+# Reviews must contain a numerical rating from 1 to 10 with fractions allowed.
 type Review {
 	id: ID! @id
 	text: String
 	rating: Float!
 	album: Album! @relation(name: "ReviewToAlbum", onDelete: SET_NULL)
-	comments: [Comment!]! @relation(name:"ReviewToComment", onDelete: CASCADE)
+	comments: [Comment!]! @relation(name: "ReviewToComment", onDelete: CASCADE)
 	author: User! @relation(name: "ReviewToUser", onDelete: SET_NULL)
 }
 
-type Comment{
+type Comment {
 	id: ID! @id
 	author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
 	album: Review! @relation(name: "CommentToReview", onDelete: SET_NULL)
 	text: String!
 }
 
-# Admins can update and delete everything
-# Editors can edit artists and albums no matter who entered them
-# Normal users cannot change an artist or album that someone else entered, but can submit them 
-enum UserType{
+# Admins can update and delete everything from users to artists to reviews and albums
+# Editors can edit artists and albums no matter who entered them, but cannot edit other users or their reviews, or delete artists or their albums
+# Normal users cannot change an artist or album that someone else entered, but can submit them
+enum UserType {
 	ADMIN
 	EDITOR
 	NORMAL
