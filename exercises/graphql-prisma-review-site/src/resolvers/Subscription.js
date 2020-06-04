@@ -1,36 +1,36 @@
-const Subscription = {
-	count: {
-		subscribe(parent, args, { pubsub }, info) {
-			let count = 0;
+// const Subscription = {
+// 	count: {
+// 		subscribe(parent, args, { pubsub }, info) {
+// 			let count = 0;
 
-			setInterval(() => {
-				count++;
-				pubsub.publish(`count`, {
-					count,
-				});
-			}, 1000);
+// 			setInterval(() => {
+// 				count++;
+// 				pubsub.publish(`count`, {
+// 					count,
+// 				});
+// 			}, 1000);
 
-			return pubsub.asyncIterator(`count`);
-		},
-	},
-	comment: {
-		subscribe(parent, { postId }, { pubsub, db }, info) {
-			const post = db.proasts.find((proast) => {
-				return proast.published && proast.id === postId;
-			});
+// 			return pubsub.asyncIterator(`count`);
+// 		},
+// 	},
+// 	comment: {
+// 		subscribe(parent, { postId }, { pubsub, db }, info) {
+// 			const post = db.proasts.find((proast) => {
+// 				return proast.published && proast.id === postId;
+// 			});
 
-			if (!post) {
-				throw new Error(`Post not found`);
-			}
+// 			if (!post) {
+// 				throw new Error(`Post not found`);
+// 			}
 
-			return pubsub.asyncIterator(`comment: ${postId}`);
-		},
-	},
-	post: {
-		subscribe(parent, args, { pubsub, db }, info) {
-			return pubsub.asyncIterator(`post`);
-		},
-	},
-};
+// 			return pubsub.asyncIterator(`comment: ${postId}`);
+// 		},
+// 	},
+// 	post: {
+// 		subscribe(parent, args, { pubsub, db }, info) {
+// 			return pubsub.asyncIterator(`post`);
+// 		},
+// 	},
+// };
 
-export default Subscription;
+// export default Subscription;

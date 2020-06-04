@@ -4,7 +4,7 @@ type User {
 	name: String!
 	email: String! @unique
 	password: String!
-	reviews: [Review!]! @relation(name: "UserToReview", onDelete: CASCADE)
+	reviews: [Review!] @relation(name: "UserToReview", onDelete: CASCADE)
 	active: Boolean!
 }
 
@@ -15,7 +15,6 @@ type Artist {
 	active: Boolean
 	picture: String
 	bio: String
-	addedBy: User! @relation(name: "ArtistToUser", onDelete: SET_NULL)
 	links: [String] @scalarList(strategy: RELATION)
 	albums: [Album!]! @relation(name: "ArtistToAlbum", onDelete: CASCADE)
 }
@@ -23,7 +22,7 @@ type Artist {
 type Album {
 	id: ID! @id
 	title: String!
-	artist: [Artist!]! @relation(name: "AlbumToArtist", onDelete: SET_NULL)
+	artist: [Artist!] @relation(name: "AlbumToArtist", onDelete: SET_NULL)
 	releaseDate: String!
 	cover: String!
 	ratings: [Review!] @relation(name: "AlbumToReview", onDelete: SET_NULL)
@@ -34,7 +33,7 @@ type Review {
 	id: ID! @id
 	text: String
 	rating: Float!
-	album: Album! @relation(name: "ReviewToAlbum", onDelete: SET_NULL)
+	album: Album @relation(name: "ReviewToAlbum", onDelete: SET_NULL)
 	comments: [Comment!]! @relation(name: "ReviewToComment", onDelete: CASCADE)
 	author: User! @relation(name: "ReviewToUser", onDelete: SET_NULL)
 }
@@ -42,7 +41,7 @@ type Review {
 type Comment {
 	id: ID! @id
 	author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
-	album: Review! @relation(name: "CommentToReview", onDelete: SET_NULL)
+	review: Review! @relation(name: "CommentToReview", onDelete: SET_NULL)
 	text: String!
 }
 

@@ -1,79 +1,118 @@
 import { Prisma } from 'prisma-binding';
+import crypto from 'crypto';
 
 const prisma = new Prisma({
 	typeDefs: `src/generated/prisma.graphql`,
 	endpoint: `http://localhost:4466`,
 });
 
-// createPost({
-// 	title: 'recipes',
-// 	body: "I'm so hungry. Feed me mitch.",
-// 	published: true,
-// 	author: 'ckaofh7xm00es07694fpg3r5i',
-// });
+export { prisma as default };
 
-async function changePost({ id, changes }) {
-	const post = await prisma.mutation.updatePost(
-		{
-			where: { id },
-			data: {
-				...changes,
-			},
-		},
-		`{id body title body published}`
-	);
+/* 
+	User Functions
+*/
 
-	console.log(JSON.stringify(post, undefined, 2));
-}
+// async function createUser({ userData }) {
+// 	userData.password = crypto.createHmac('sha256', userData.password);
+// 	console.log('user password hashed as ', userData.password);
+// 	const user = await prisma.mutation.createUser(
+// 		{
+// 			data: { ...userData },
+// 		},
+// 		`{id name email active}`
+// 	);
 
-async function createPostForUser({ id, postData }) {
-	const userExists = await prisma.exists.User({
-		id,
-	});
+// 	return user;
+// }
 
-	if (!userExists) {
-		throw new Error(`No user with this ID exists`);
-	}
+// createUser({ userData: { name: 'Tester', email: 'tester@tester.com', password: '1234', active: true } }).catch((err) =>
+// 	console.error(err)
+// );
 
-	const post = await prisma.mutation.createPost(
-		{
-			data: {
-				...postData,
-				author: {
-					connect: {
-						id,
-					},
-				},
-			},
-		},
-		`{ id title published body author{id name email}}`
-	);
+// async function deleteUser({ id }) {
+// 	const userExists = await prisma.exists.User({
+// 		id,
+// 	});
+// 	if (!userExistsx) {
+// 		throw new Error(`no user with this id exists`);
+// 	}
 
-	return post;
-}
+// 	const user = await prisma.mutation.deleteUser(
+// 		{
+// 			where: { id },
+// 		},
+// 		`{id name email active}`
+// 	);
 
-async function updatePostForUser({ id, changes }) {
-	const postExists = await prisma.exists.Post({
-		id,
-	});
+// 	return user;
+// }
 
-	if (!postExists) {
-		throw new Error(`no Post with this id exists`);
-	}
-	const post = await prisma.mutation.updatePost(
-		{
-			where: {
-				id,
-			},
-			data: {
-				...changes,
-			},
-		},
-		`{id title body published author{id name email}}`
-	);
+// async function updateUser({ id, changes }) {
+// 	const userExists = await prisma.exists.User({
+// 		id,
+// 	});
+// 	if (!userExistsx) {
+// 		throw new Error(`no user with this id exists`);
+// 	}
+// 	const user = await prisma.mutation.updateUser(
+// 		{
+// 			where: { id },
+// 			data: { ...changes },
+// 		},
+// 		`{id name email active}`
+// 	);
 
-	return post;
-}
+// 	return user;
+// }
+
+// async function createPostForUser({ id, postData }) {
+// 	const userExists = await prisma.exists.User({
+// 		id,
+// 	});
+
+// 	if (!userExists) {
+// 		throw new Error(`No user with this ID exists`);
+// 	}
+
+// 	const post = await prisma.mutation.createPost(
+// 		{
+// 			data: {
+// 				...postData,
+// 				author: {
+// 					connect: {
+// 						id,
+// 					},
+// 				},
+// 			},
+// 		},
+// 		`{ id title published body author{id name email}}`
+// 	);
+
+// 	return post;
+// }
+
+// async function updatePostForUser({ id, changes }) {
+// 	const postExists = await prisma.exists.Post({
+// 		id,
+// 	});
+
+// 	if (!postExists) {
+// 		throw new Error(`no Post with this id exists`);
+// 	}
+// 	const post = await prisma.mutation.updatePost(
+// 		{
+// 			where: {
+// 				id,
+// 			},
+// 			data: {
+// 				...changes,
+// 			},
+// 		},
+// 		`{id title body published author{id name email}}`
+// 	);
+
+// 	return post;
+// }
 
 // createPostForUser({
 // 	id: 'ckaoe9rsp001i0769s1t8c4ol',
