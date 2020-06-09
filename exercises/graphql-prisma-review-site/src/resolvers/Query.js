@@ -1,8 +1,11 @@
 const Query = {
 	users(parent, args, { prisma }, info) {
+		const opArgs = {};
+		if (args.query) {
+		}
 		// when you query through node you can use a string, nothing, or an object.
-		// we return the promise for this resolver
-		return prisma.query.users(null, info);
+		// we return the promise for this resolve
+		return prisma.query.users(opArgs, info);
 	},
 	artists(parent, args, { prisma }, info) {
 		return prisma.query.artists(null, info);
