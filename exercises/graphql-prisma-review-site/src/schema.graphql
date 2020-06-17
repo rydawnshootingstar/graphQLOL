@@ -1,9 +1,9 @@
 type Query {
 	me: User!
 	users(query: String): [User!]!
-	artists: [Artist!]!
-	albums: [Album!]!
-	reviews: [Review!]!
+	artists(query: String): [Artist!]!
+	albums(query: String): [Album!]!
+	reviews(query: String): [Review!]!
 }
 
 type Mutation {

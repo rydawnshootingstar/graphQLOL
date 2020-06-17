@@ -26,11 +26,25 @@ const Query = {
 		}
 		return prisma.query.artists(opArgs, info);
 	},
-	// reviews(parent, args, { prisma }, info) {
-	// 	return prisma.query.reviews(null, info);
-	// },
-	// albums(parent, args, { prisma }, info) {
-	// 	return prisma.query.albums(null, info);
-	// },
+	reviews(parent, args, { prisma }, info) {
+		const opArgs = {};
+		if (args.query) {
+			opArgs.where = {
+				album: {
+					title_contains: args.query,
+				},
+			};
+		}
+		return prisma.query.reviews(opArgs, info);
+	},
+	albums(parent, args, { prisma }, info) {
+		const opArgs = {};
+		if (args.query) {
+			opArgs.where = {
+				title_contains: args.query,
+			};
+		}
+		return prisma.query.albums(opArgs, info);
+	},
 };
 export default Query;
