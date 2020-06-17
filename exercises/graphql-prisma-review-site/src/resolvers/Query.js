@@ -1,4 +1,10 @@
 const Query = {
+	/* 
+		- when you query through node you can use a string, nothing, or an object as a parameter to your prisma query. we'll use an object
+		- return the promise provided by prisma.query for each query call 
+		TODO: connect to db and use raw queries for future searches on frontend, as prisma's _contains is case sensitive only 
+			sources: https://www.youtube.com/watch?time_continue=12&v=YUjlBuI8xsU
+	*/
 	users(parent, args, { prisma }, info) {
 		const opArgs = {};
 		if (args.query) {
@@ -13,8 +19,7 @@ const Query = {
 				],
 			};
 		}
-		// when you query through node you can use a string, nothing, or an object.
-		// we return the promise for this resolve
+
 		return prisma.query.users(opArgs, info);
 	},
 	artists(parent, args, { prisma }, info) {
