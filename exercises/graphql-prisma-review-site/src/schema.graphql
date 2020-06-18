@@ -4,18 +4,21 @@ type Query {
 	artists(query: String): [Artist!]!
 	albums(query: String): [Album!]!
 	reviews(query: String): [Review!]!
+	comments: [Comment!]!
 }
 
 type Mutation {
-	createUser(data: CreateUserInput): User!
+	createUser(data: CreateUserInput!): User!
 	updateUser(id: ID!, data: UpdateUserInput): User!
+	deleteUser(id: ID!): User
 }
 
 input CreateUserInput {
 	name: String!
-	email: String
+	email: String!
 	password: String!
 	active: Boolean!
+	type: UserType!
 }
 
 input UpdateUserInput {

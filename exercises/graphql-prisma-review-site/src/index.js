@@ -1,6 +1,11 @@
 import { GraphQLServer, PubSub } from 'graphql-yoga';
 import Query from './resolvers/Query';
 import User from './resolvers/User';
+import Album from './resolvers/Album';
+import Artist from './resolvers/Artist';
+import Comment from './resolvers/Comment';
+import Mutation from './resolvers/Mutation';
+import Review from './resolvers/Review';
 import prisma from './prisma';
 /*
     Server Config and Initialization
@@ -13,6 +18,11 @@ const server = new GraphQLServer({
 	resolvers: {
 		Query,
 		User,
+		Album,
+		Artist,
+		Comment,
+		Mutation,
+		Review,
 	},
 	context: {
 		pubsub,

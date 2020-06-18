@@ -51,5 +51,8 @@ const Query = {
 		}
 		return prisma.query.albums(opArgs, info);
 	},
+	comments(parent, args, { prisma }, info) {
+		return prisma.query.comments(null, info);
+	},
 };
 export default Query;
