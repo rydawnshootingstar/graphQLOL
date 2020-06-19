@@ -11,6 +11,12 @@ type Mutation {
 	createUser(data: CreateUserInput!): User!
 	updateUser(id: ID!, data: UpdateUserInput): User!
 	deleteUser(id: ID!): User
+	createArtist(data: CreateArtistInput!): Artist!
+	updateArtist(id: ID!, data: UpdateArtistInput): Artist!
+	deleteArtist(id: ID!): Artist!
+	createAlbum(data: CreateAlbumInput!): Album!
+	updateAlbum(id: ID!, data: UpdateAlbumInput!): Album!
+	deleteAlbum(id: ID!): Album!
 }
 
 input CreateUserInput {
@@ -26,6 +32,38 @@ input UpdateUserInput {
 	email: String
 	password: String
 	active: Boolean
+}
+
+input CreateArtistInput {
+	name: String!
+	genre: String
+	active: Boolean
+	picture: String
+	bio: String
+	links: [String]
+}
+
+input UpdateArtistInput {
+	name: String
+	genre: String
+	active: Boolean
+	picture: String
+	bio: String
+	links: [String]
+}
+
+input CreateAlbumInput {
+	title: String!
+	artist: ID!
+	releaseDate: String!
+	cover: String!
+}
+
+input UpdateAlbumInput {
+	title: String
+	artist: ID
+	releaseDate: String
+	cover: String
 }
 
 type User {
@@ -46,13 +84,13 @@ type Artist {
 	picture: String
 	bio: String
 	links: [String]
-	albums: [Album!]!
+	albums: [Album!]
 }
 
 type Album {
 	id: ID!
 	title: String!
-	artist: [Artist!]
+	artist: Artist!
 	releaseDate: String!
 	cover: String!
 	ratings: [Review!]

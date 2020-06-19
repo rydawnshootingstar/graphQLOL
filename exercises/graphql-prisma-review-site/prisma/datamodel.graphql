@@ -22,7 +22,7 @@ type Artist {
 type Album {
 	id: ID! @id
 	title: String!
-	artist: [Artist!] @relation(name: "AlbumToArtist", onDelete: SET_NULL)
+	artist: Artist! @relation(name: "AlbumToArtist", onDelete: SET_NULL)
 	releaseDate: String!
 	cover: String!
 	ratings: [Review!] @relation(name: "AlbumToReview", onDelete: SET_NULL)
